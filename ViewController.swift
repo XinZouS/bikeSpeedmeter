@@ -21,11 +21,11 @@ class ViewController: UIViewController {
         return v
     }()
     
-    var engine: AVAudioEngine!      //The Audio Engine
-    var player: AVAudioPlayerNode!  //The Player of the audiofile
-    var file = AVAudioFile()        //Where we're going to store the audio file
-    var timer: Timer?               //Timer to update the meter every 0.1 ms
-    var volumeFloat:Float = 0.0     //Where We're going to store the volume float
+    private var engine: AVAudioEngine!      //The Audio Engine
+    private var player: AVAudioPlayerNode!  //The Player of the audiofile
+    private var file = AVAudioFile()        //Where we're going to store the audio file
+    private var timer: Timer?               //Timer to update the meter every 0.1 ms
+    private var volumeFloat: Float = 0.0    //Where We're going to store the volume float
 
     
     
@@ -46,50 +46,32 @@ class ViewController: UIViewController {
     private func setupAVAudioEngine() {
         //init engine and player
         engine = AVAudioEngine()
-        player = AVAudioPlayerNode()
-        
-        //Look for the audiofile on the project
-        let path = Bundle.main.path(forResource: "Trouble_Is_A_Friend", ofType: "mp3")!
-        let url = NSURL.fileURL(withPath: path)
-        
-        //create the AVAudioFile
-        let file = try? AVAudioFile(forReading: url)
-        let buffer = AVAudioPCMBuffer(pcmFormat: file!.processingFormat, frameCapacity: AVAudioFrameCount(file!.length))
+        let audioSession = AVAudioSession.sharedInstance()
         do {
-            //Do it
-            try file!.read(into: buffer!)
-        } catch _ {
+            try audioSession.setCategory(AVAudioSessionCategoryRecord)
+            try audioSession.setMode(AVAudioSessionModeMeasurement)
+            try audioSession.setActive(true, with: .notifyOthersOnDeactivation)
+        } catch {
+            print("audioSession properties weren't set because of an error.")
         }
         
-        engine.attach(player)
-        engine.connect(player, to: engine.mainMixerNode, format: buffer!.format)
-
-        
-        //installTap with a bufferSize of 1024 with the processingFormat of the current audioFile on bus 0
-        engine.mainMixerNode.installTap(onBus:0, bufferSize: 1024, format: file?.processingFormat) {
-            (buffer : AVAudioPCMBuffer!, time : AVAudioTime!) in
-            
-            let dataptrptr = buffer.floatChannelData!           //Get buffer of floats
+        let inputNode = engine.inputNode as AVAudioInputNode
+        let recordingFormat = inputNode.outputFormat(forBus: 0)
+        inputNode.installTap(onBus: 0, bufferSize: 1024, format: recordingFormat) { (buffer, when) in
+            let dataptrptr = buffer.floatChannelData!
             let dataptr = dataptrptr.pointee
-            let datum = dataptr[Int(buffer.frameLength) - 1]    //Get a single float to read
+            let datum = dataptr[Int(buffer.frameLength) - 1]
             
-            //store the float on the variable
-            self.volumeFloat = fabs((datum))
+            self.volumeFloat = fabs(datum)
         }
-        
-        
-        //Loop the audio file for demo purposes
-        player.scheduleBuffer(buffer!, at: nil, options: AVAudioPlayerNodeBufferOptions.loops, completionHandler: nil)
         
         engine.prepare()
         do {
             try engine.start()
-        } catch _ {
-        }
+        } catch let err {
+            print("audioEngine couldn't start because of an error: \(err)")
+        }        
         
-        player.play()
-
-
         //start timer to update the meter
         timer = Timer.scheduledTimer(timeInterval: 0.1 , target: self, selector: #selector(updateMeter), userInfo: nil, repeats: true)
         
@@ -105,7 +87,6 @@ class ViewController: UIViewController {
 //        }
         
     }
-    
 
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
