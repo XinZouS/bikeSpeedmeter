@@ -48,7 +48,7 @@ class ViewController: UIViewController {
     }
 
     let pointer = PointerView()
-    
+    let meterView = MeterView()
     
     
     override func viewDidLoad() {
@@ -58,7 +58,7 @@ class ViewController: UIViewController {
         setupLabels()
         setupAVAudioEngine()
         
-        setupPointerView()
+        setupPointerMeterView()
     }
     
     
@@ -104,8 +104,12 @@ class ViewController: UIViewController {
         volumeCurrIdx = (volumeCurrIdx + 1) % len
     }
     
-    private func setupPointerView() {
-        pointer.addPointerInCenterOf(self.view)
+    private func setupPointerMeterView() {
+        let sz = self.view.bounds.width - 80
+        meterView.addOnCenterOfParentView(self.view, offsetX: 0, offsetY: 60, size: CGSize(width: sz, height: sz))
+        
+        pointer.addPointerInCenterOf(meterView)
+        pointer.setStartingAngle(-(CGFloat.pi * 3.0/4.0))
     }
 
 

@@ -11,11 +11,7 @@ import UIKit
 
 class PointerView: UIView {
     
-    public var image: UIImage! {
-        didSet{
-            pointerImgView.image = image
-        }
-    }
+    private var startingAngle: CGFloat = 0
     
     private let pointerContainerView = UIView()
     private let pointerImgView: UIImageView = {
@@ -25,7 +21,15 @@ class PointerView: UIView {
         return v
     }()
     
-
+    /// 0=12:00, 1/2pi=3:00, pi=6:00, -1/2pi=9:00
+    public func setStartingAngle(_ a: CGFloat) {
+        startingAngle = a
+    }
+    
+    public func setPointerImage(_ img: UIImage) {
+        pointerImgView.image = img
+    }
+    
     public func addPointerInCenterOf(_ parentView: UIView) {
         parentView.addSubview(pointerContainerView)
         pointerContainerView.translatesAutoresizingMaskIntoConstraints = false
@@ -42,7 +46,7 @@ class PointerView: UIView {
     }
     
     public func rotateTo(_ angle: Float) {
-        pointerContainerView.transform = CGAffineTransform(rotationAngle: CGFloat(angle * 10))
+        pointerContainerView.transform = CGAffineTransform(rotationAngle: startingAngle + CGFloat(angle * 10))
     }
     
 
