@@ -17,7 +17,7 @@ class PointerView: UIView {
     private let pointerImgView: UIImageView = {
         let v = UIImageView()
         v.contentMode = .scaleToFill
-        v.backgroundColor = .green 
+        v.backgroundColor = .orange
         return v
     }()
     

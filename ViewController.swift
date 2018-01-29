@@ -106,7 +106,10 @@ class ViewController: UIViewController {
     
     private func setupPointerMeterView() {
         let sz = self.view.bounds.width - 80
+        let startAngle = (CGFloat.pi * 3.0/4.0)
+        let endAngle = (CGFloat.pi * 1.0/4.0)        
         meterView.addOnCenterOfParentView(self.view, offsetX: 0, offsetY: 60, size: CGSize(width: sz, height: sz))
+        meterView.addCirclePath(radius: sz * 0.46, startAngle: startAngle, endAngle: endAngle)
         
         pointer.addPointerInCenterOf(meterView)
         pointer.setStartingAngle(-(CGFloat.pi * 3.0/4.0))
