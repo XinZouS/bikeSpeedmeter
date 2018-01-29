@@ -7,7 +7,6 @@
 //
 
 import UIKit
-import AVFoundation
 
 class ViewController: UIViewController {
 
@@ -33,10 +32,8 @@ class ViewController: UIViewController {
         return l
     }()
 
-    private var engine: AVAudioEngine!      //The Audio Engine
-    private var player: AVAudioPlayerNode!  //The Player of the audiofile
-    private var file = AVAudioFile()        //Where we're going to store the audio file
-    private var timer: Timer?               //Timer to update the meter every 0.1 ms
+    private let audioEngine = AudioEngine()
+    private var timer : Timer!
     
     private var volumeFloat: Float = 0.0    //Where We're going to store the volume float
     private var volumeAverage: Float = 0.0
@@ -51,6 +48,8 @@ class ViewController: UIViewController {
     }
 
     let pointer = PointerView()
+    let meterView = MeterView()
+    
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -59,7 +58,7 @@ class ViewController: UIViewController {
         setupLabels()
         setupAVAudioEngine()
         
-        setupPointerView()
+        setupPointerMeterView()
     }
     
     
@@ -77,39 +76,11 @@ class ViewController: UIViewController {
     }
 
     private func setupAVAudioEngine() {
-        
-        engine = AVAudioEngine()
-        
-        let audioSession = AVAudioSession.sharedInstance()
-        do {
-            try audioSession.setCategory(AVAudioSessionCategoryRecord)
-            try audioSession.setMode(AVAudioSessionModeMeasurement)
-            try audioSession.setActive(true, with: .notifyOthersOnDeactivation)
-        } catch {
-            print("audioSession properties weren't set because of an error.")
+        audioEngine.sensibility = 5
+        audioEngine.setupAVAudioEngine { (getVolum) in
+            self.volumeFloat = getVolum
         }
-        
-        let inputNode = engine.inputNode as AVAudioInputNode
-        let recordingFormat = inputNode.outputFormat(forBus: 0)
-        inputNode.installTap(onBus: 0, bufferSize: 1024, format: recordingFormat) { (buffer, when) in
-            let dataFloatChannel = buffer.floatChannelData!
-            let dataptr = dataFloatChannel.pointee
-            let datum = dataptr[Int(buffer.frameLength) - 1]
-            
-            self.volumeFloat = fabs(datum) * 10
-            self.volumePeakValue = max(self.volumePeakValue, self.volumeFloat)
-        }
-        
-        engine.prepare()
-        do {
-            try engine.start()
-        } catch let err {
-            print("audioEngine couldn't start because of an error: \(err)")
-        }        
-        
-        //start timer to update the meter
         timer = Timer.scheduledTimer(timeInterval: 0.05 , target: self, selector: #selector(updateMeter), userInfo: nil, repeats: true)
-        
     }
     
     @objc func updateMeter() { // call by timer
@@ -133,8 +104,15 @@ class ViewController: UIViewController {
         volumeCurrIdx = (volumeCurrIdx + 1) % len
     }
     
-    private func setupPointerView() {
-        pointer.addPointerInCenterOf(self.view)
+    private func setupPointerMeterView() {
+        let sz = self.view.bounds.width - 80
+        let startAngle = (CGFloat.pi * 3.0/4.0)
+        let endAngle = (CGFloat.pi * 1.0/4.0)        
+        meterView.addOnCenterOfParentView(self.view, offsetX: 0, offsetY: 60, size: CGSize(width: sz, height: sz))
+        meterView.addCirclePath(radius: sz * 0.46, startAngle: startAngle, endAngle: endAngle)
+        
+        pointer.addPointerInCenterOf(meterView)
+        pointer.setStartingAngle(-(CGFloat.pi * 3.0/4.0))
     }
 
 
