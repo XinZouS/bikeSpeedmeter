@@ -53,9 +53,9 @@ class ViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = .white
+        view.backgroundColor = .black
         setupProgressView()
-        setupLabels()
+        //setupLabels()
         setupAVAudioEngine()
         
         setupPointerMeterView()
@@ -64,15 +64,15 @@ class ViewController: UIViewController {
     
     private func setupProgressView() {
         view.addSubview(progressView)
-        progressView.addConstraints(left: view.leftAnchor, top: view.topAnchor, right: view.rightAnchor, bottom: nil, leftConstent: 20, topConstent: 150, rightConstent: 20, bottomConstent: 0, width: 0, height: 5)
+        progressView.addConstraints(left: view.leftAnchor, top: view.topAnchor, right: view.rightAnchor, bottom: nil, leftConstent: 20, topConstent: 30, rightConstent: 20, bottomConstent: 0, width: 0, height: 5)
     }
     
     private func setupLabels() {
         view.addSubview(averageLabel)
-        averageLabel.addConstraints(left: view.leftAnchor, top: view.topAnchor, right: nil, bottom: nil, leftConstent: 60, topConstent: 200, rightConstent: 0, bottomConstent: 0, width: 0, height: 0)
+        averageLabel.addConstraints(left: view.leftAnchor, top: view.topAnchor, right: nil, bottom: nil, leftConstent: 60, topConstent: 40, rightConstent: 0, bottomConstent: 0, width: 0, height: 0)
         
         view.addSubview(countLabel)
-        countLabel.addConstraints(left: nil, top: view.topAnchor, right: view.rightAnchor, bottom: nil, leftConstent: nil, topConstent: 200, rightConstent: 60, bottomConstent: 0, width: 0, height: 0)
+        countLabel.addConstraints(left: nil, top: view.topAnchor, right: view.rightAnchor, bottom: nil, leftConstent: nil, topConstent: 40, rightConstent: 60, bottomConstent: 0, width: 0, height: 0)
     }
 
     private func setupAVAudioEngine() {
@@ -105,10 +105,10 @@ class ViewController: UIViewController {
     }
     
     private func setupPointerMeterView() {
-        let sz = self.view.bounds.width - 80
+        let sz = self.view.bounds.width
         let startAngle = (CGFloat.pi * 3.0/4.0)
         let endAngle = (CGFloat.pi * 1.0/4.0)        
-        meterView.addOnCenterOfParentView(self.view, offsetX: 0, offsetY: 60, size: CGSize(width: sz, height: sz))
+        meterView.addOnCenterOfParentView(self.view, offsetX: 0, offsetY: -80, size: CGSize(width: sz, height: sz))
         meterView.addCirclePath(radius: sz * 0.46, startAngle: startAngle, endAngle: endAngle)
         
         pointer.addPointerInCenterOf(meterView)
