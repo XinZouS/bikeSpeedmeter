@@ -91,7 +91,7 @@ class ViewController: UIViewController {
         getAverage()
 
         self.progressView.setProgress(volumeFloat, animated: false)
-        pointer.rotateTo(volumeFloat)
+        pointer.rotateTo(volumeAverage)
     }
     
     private func getAverage() {
@@ -109,10 +109,18 @@ class ViewController: UIViewController {
         let startAngle = (CGFloat.pi * 3.0/4.0)
         let endAngle = (CGFloat.pi * 1.0/4.0)        
         meterView.addOnCenterOfParentView(self.view, offsetX: 0, offsetY: -80, size: CGSize(width: sz, height: sz))
-        meterView.addCirclePath(radius: sz * 0.46, startAngle: startAngle, endAngle: endAngle)
-        
+        let r = sz * 0.46
+        meterView.addCirclePath(radius: r, lineWidth: 10, startAngle: startAngle, endAngle: endAngle, color: .cyan)
+        meterView.addCirclePath(radius: r + 10, lineWidth: 2, startAngle: startAngle, endAngle: endAngle, color: .white)
+        meterView.addScales(length: 40, step: 10, radius: r - 15, startAngle: startAngle, endAngle: endAngle,
+                            pinHeigh: 30, pinWidth: 5, color: .white, shadowColor: .white, shadowRadius: 5)
+        meterView.addScales(length: 40, step: 5, radius: r - 10, startAngle: startAngle, endAngle: endAngle,
+                            pinHeigh: 15, pinWidth: 2, color: .white, shadowColor: .cyan, shadowRadius: 2)
+
         pointer.addPointerInCenterOf(meterView)
         pointer.setStartingAngle(-(CGFloat.pi * 3.0/4.0))
+        pointer.setPointerImage(#imageLiteral(resourceName: "small-noglow"), shadowColor: .cyan, shadowRadius: 10)
+        
     }
 
 

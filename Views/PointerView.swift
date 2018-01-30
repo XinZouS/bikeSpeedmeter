@@ -17,7 +17,7 @@ class PointerView: UIView {
     private let pointerImgView: UIImageView = {
         let v = UIImageView()
         v.contentMode = .scaleToFill
-        v.backgroundColor = .orange
+        //v.backgroundColor = .orange
         return v
     }()
     
@@ -26,8 +26,13 @@ class PointerView: UIView {
         startingAngle = a
     }
     
-    public func setPointerImage(_ img: UIImage) {
+    public func setPointerImage(_ img: UIImage, shadowColor: UIColor?, shadowRadius: CGFloat?) {
         pointerImgView.image = img
+        if let clr = shadowColor {
+            pointerImgView.layer.shadowColor = clr.cgColor
+            pointerImgView.layer.shadowRadius = shadowRadius ?? 0.0
+            pointerImgView.layer.shadowOpacity = 1
+        }
     }
     
     public func addPointerInCenterOf(_ parentView: UIView) {
@@ -41,7 +46,7 @@ class PointerView: UIView {
         
         pointerContainerView.addSubview(pointerImgView)
         pointerImgView.translatesAutoresizingMaskIntoConstraints = false
-        pointerImgView.addConstraints(left: nil, top: nil, right: nil, bottom: pointerContainerView.bottomAnchor, leftConstent: nil, topConstent: 0, rightConstent: 0, bottomConstent: 0, width: 10, height: 160)
+        pointerImgView.addConstraints(left: nil, top: nil, right: nil, bottom: pointerContainerView.bottomAnchor, leftConstent: nil, topConstent: 0, rightConstent: 0, bottomConstent: -10, width: 50, height: 180)
         pointerImgView.centerXAnchor.constraint(equalTo: pointerContainerView.centerXAnchor).isActive = true
     }
     
